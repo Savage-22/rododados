@@ -7,8 +7,9 @@ select
     bs2.name as destination,
     sum(tk.price) as total_revenue
 from Route r
-join Trip tr on tr.route_id = r.id
-join Ticket tk on tk.trip_id = tr.id
+join Schedule sch on sch.route_id = r.id
+join SeatOnSchedule sos on sos.schedule_id = sch.id
+join Ticket tk on tk.seat_on_schedule_id = sos.id
 join BusStop bs1 on r.origin_id = bs1.id
 join BusStop bs2 on r.destination_id = bs2.id
 group by r.id, bs1.name, bs2.name
