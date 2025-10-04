@@ -18,17 +18,38 @@ order by total_revenue desc;
 -- ================================
 -- Taxa de ocupação média dos ônibus
 -- ================================
-select 
-    b.plate,
-    avg(ticket_count::decimal / b.capacity) * 100 as avg_occupancy_rate
-from Bus b
-join Trip tr on tr.bus_plate = b.plate
-left join (
-    select trip_id, count(*) as ticket_count
-    from Ticket
-    group by trip_id
-) tcount on tcount.trip_id = tr.id
-group by b.plate;
+SELECT
+    V.license_plate,
+    V.brand,
+    V.model,
+    -- Calcula a média da taxa de ocupação: (Soma de Assentos Ocupados / Soma de Capacidade) * 100
+    -- Usamos AVG() da proporção por agendamento ou a proporção global, dependendo da necessidade de detalhe
+    -- Optando por calcular a taxa média por agendamento (schedule) para precisão:
+    AVG(T.tickets_vendidos::decimal * 100 / VC.capacity) AS avg_occupancy_rate_percent
+FROM Vehicle V
+JOIN (
+    -- Subconsulta 1: Capacidade (total de assentos) por veículo
+    SELECT
+        license_plate,
+        COUNT(id) AS capacity
+    FROM Seat
+    GROUP BY license_plate
+) VC ON VC.license_plate = V.license_plate
+JOIN Seat S ON S.license_plate = V.license_plate
+JOIN SeatOnSchedule SOS ON SOS.seat_id = S.id
+LEFT JOIN (
+    -- Subconsulta 2: Bilhetes vendidos por Horário e Veículo
+    SELECT
+        SOS.schedule_id,
+        S.license_plate,
+        COUNT(T.id) AS tickets_vendidos
+    FROM SeatOnSchedule SOS
+    JOIN Ticket T ON T.seat_on_schedule_id = SOS.id
+    JOIN Seat S ON S.id = SOS.seat_id
+    GROUP BY SOS.schedule_id, S.license_plate
+) T ON T.schedule_id = SOS.schedule_id AND T.license_plate = V.license_plate
+GROUP BY V.license_plate, V.brand, V.model, VC.capacity
+ORDER BY avg_occupancy_rate_percent DESC;
 
 -- ================================
 -- Ranking de motoristas por quantidade de viagens
