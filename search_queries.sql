@@ -65,11 +65,12 @@ order by highest_mileage desc;
 -- ================================
 -- Passageiros que mais compraram bilhetes
 -- ================================
-select 
-    passenger_name,
-    count(*) as total_tickets,
-    sum(price) as total_spent
-from Ticket
-group by passenger_name
-order by total_spent desc
-limit 10;
+SELECT 
+  p.first_name || ' ' || p.last_name AS passenger_name,
+  COUNT(t.id) AS total_tickets,
+  SUM(t.price) AS total_spent
+FROM Ticket t
+JOIN Passenger p ON p.cpf = t.passenger_cpf
+GROUP BY p.cpf, p.first_name, p.last_name
+ORDER BY total_spent DESC
+LIMIT 50;
