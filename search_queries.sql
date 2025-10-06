@@ -3,6 +3,7 @@
 -- ================================
 SELECT 
   r.id AS route_id,
+  cp.name AS company_name,
   bs1.name AS origin,
   bs2.name AS destination,
   SUM(tk.price) AS total_revenue
@@ -12,7 +13,9 @@ JOIN SeatOnSchedule sos ON sos.schedule_id = s.id
 JOIN Ticket tk ON tk.seat_on_schedule_id = sos.id
 JOIN BusStop bs1 ON r.origin_id = bs1.id
 JOIN BusStop bs2 ON r.destination_id = bs2.id
-GROUP BY r.id, bs1.name, bs2.name
+Join CompanyRoute cr ON cr.route_id = r.id
+Join Company cp ON cp.cnpj = cr.cnpj
+GROUP BY cp.name, r.id, bs1.name, bs2.name
 ORDER BY total_revenue DESC;
 
 -- ================================
