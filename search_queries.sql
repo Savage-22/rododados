@@ -75,3 +75,22 @@ JOIN Passenger p ON p.cpf = t.passenger_cpf
 GROUP BY p.cpf, p.first_name, p.last_name
 ORDER BY total_spent DESC
 LIMIT 50;
+
+
+-- ================================
+-- Tempo de viagem de cada motorista num intervalo de 30 dias
+-- ================================
+WITH recent_schedules AS (
+    SELECT * FROM Schedule
+    WHERE departure_time >= NOW() - interval '30 day'
+)
+SELECT
+    e.first_name || ' ' || e.last_name AS driver_name,
+    e.cpf,
+    SUM(s.travel_time) AS total_travel_time
+FROM Employee e
+JOIN ScheduleEmployee se ON e.cpf = se.employee_cpf
+JOIN recent_schedules s ON se.schedule_id = s.id
+WHERE e.role = 'Motorista'
+GROUP BY e.cpf, driver_name
+ORDER BY total_travel_time DESC;
