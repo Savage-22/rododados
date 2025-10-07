@@ -1,5 +1,5 @@
 -- ================================
--- Receita total por rota
+-- Receita total por rota ✅
 -- ================================
 SELECT 
   r.id AS route_id,
@@ -19,19 +19,17 @@ GROUP BY cp.name, r.id, bs1.name, bs2.name
 ORDER BY total_revenue DESC;
 
 -- ================================
--- Taxa de ocupação média dos ônibus
+-- Passageiros que mais compraram tickets ✅
 -- ================================
 select 
-    b.plate,
-    avg(ticket_count::decimal / b.capacity) * 100 as avg_occupancy_rate
-from Bus b
-join Trip tr on tr.bus_plate = b.plate
-left join (
-    select trip_id, count(*) as ticket_count
-    from Ticket
-    group by trip_id
-) tcount on tcount.trip_id = tr.id
-group by b.plate;
+    p.cpf,
+    p.first_name || ' ' || p.last_name as nome_completo,
+    count(t.id) as total_compras,
+    sum(t.price) as total_gasto
+from Passenger p
+join Ticket t on p.cpf = t.passenger_cpf
+group by p.cpf, nome_completo
+order by total_compras desc;
 
 -- ================================
 -- Ranking de motoristas por quantidade de viagens
