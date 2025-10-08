@@ -62,21 +62,6 @@ join BusStop bs2 on r.destination_id = bs2.id
 group by r.id, bs1.name, bs2.name, b.plate, b.model
 order by highest_mileage desc;
 
-
--- ================================
--- Passageiros que mais compraram bilhetes
--- ================================
-SELECT 
-  p.first_name || ' ' || p.last_name AS passenger_name,
-  COUNT(t.id) AS total_tickets,
-  SUM(t.price) AS total_spent
-FROM Ticket t
-JOIN Passenger p ON p.cpf = t.passenger_cpf
-GROUP BY p.cpf, p.first_name, p.last_name
-ORDER BY total_spent DESC
-LIMIT 50;
-
-
 -- ================================
 -- Tempo de viagem de cada motorista num intervalo de 30 dias
 -- ================================
