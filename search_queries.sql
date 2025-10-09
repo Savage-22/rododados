@@ -32,16 +32,25 @@ group by p.cpf, nome_completo
 order by total_compras desc;
 
 -- ================================
--- Ranking de motoristas por quantidade de viagens
+-- Recorrência de passageiros por rota ✅
 -- ================================
-select 
-    e.first_name || ' ' || e.last_name as driver,
-    count(tr.id) as trips_count
-from Employee e
-join Trip tr on tr.driver_cpf = e.cpf
-where e.role = 'Motorista'
-group by e.cpf
-order by trips_count desc;
+SELECT
+    p.first_name || ' ' || p.last_name AS passenger_name,
+    p.cpf,
+    r.id AS route_id,
+    bs_origin.name || ' -> ' || bs_dest.name AS route_name,
+    COUNT(t.id) AS trips_on_this_route,
+    MAX(s.departure_time) AS last_trip_date
+FROM Passenger p
+JOIN Ticket t ON p.cpf = t.passenger_cpf
+JOIN SeatOnSchedule sos ON t.seat_on_schedule_id = sos.id
+JOIN Schedule s ON sos.schedule_id = s.id
+JOIN Route r ON s.route_id = r.id
+JOIN BusStop bs_origin ON r.origin_id = bs_origin.id
+JOIN BusStop bs_dest ON r.destination_id = bs_dest.id
+GROUP BY p.cpf, passenger_name, r.id, route_name
+HAVING COUNT(t.id) >= 2
+ORDER BY trips_on_this_route DESC;
 
 
 -- ================================
@@ -63,7 +72,7 @@ group by r.id, bs1.name, bs2.name, b.plate, b.model
 order by highest_mileage desc;
 
 -- ================================
--- Tempo de viagem de cada motorista num intervalo de 30 dias
+-- Tempo de viagem de cada motorista num intervalo de 30 dias ✅
 -- ================================
 WITH recent_schedules AS (
     SELECT * FROM Schedule
