@@ -257,7 +257,6 @@ COMMENT ON COLUMN Passenger.is_student IS 'TRUE se o passageiro é estudante (te
 CREATE TABLE Student (
     id_person INT PRIMARY KEY,
     id_u VARCHAR(50) NOT NULL UNIQUE, -- ID universitário
-    student_name VARCHAR(200), -- Nome como aparece na credencial
     status VARCHAR(20) DEFAULT 'active', -- 'active', 'inactive', 'graduated'
     university_name VARCHAR(200),
     enrollment_date DATE DEFAULT CURRENT_DATE,
