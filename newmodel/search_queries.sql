@@ -137,3 +137,52 @@ GROUP BY
     P.last_name, 
     E.employee_code
 ORDER BY total_tickets_vendidos DESC;
+
+-- ================================
+-- Lista de horários de viagens disponíveis dados origem e destino específicos
+-- ================================
+
+SELECT
+    -- Detalhes da Rota
+    R.route_code AS codigo_da_rota,
+    R.name AS nome_da_rota,
+    
+    -- Detalhes do Horário (Schedule)
+    S.departure_time AS hora_de_partida_programada,
+    S.days_of_week AS dias_de_operacao, -- JSONB array (ex: [1, 2, 3, 4, 5])
+    
+    -- Cálculo do Preço do Trecho
+    -- O preço é a Tarifa Acumulada no Destino menos a Tarifa Acumulada na Origem
+    (RS_DEST.fare_from_origin - RS_ORIG.fare_from_origin) AS preco_do_ticket,
+    
+    -- Informação adicional sobre o tempo de percurso entre as paradas
+    (RS_DEST.estimated_min - RS_ORIG.estimated_min) AS tempo_estimado_minutos
+FROM Route R
+-- 1. Encontra a Parada de Origem na Rota
+JOIN Route_Stop RS_ORIG ON R.id_route = RS_ORIG.id_route
+JOIN Bus_Stop BS_ORIG ON RS_ORIG.id_stop = BS_ORIG.id_stop
+    
+-- 2. Encontra a Parada de Destino na Rota
+JOIN Route_Stop RS_DEST ON R.id_route = RS_DEST.id_route
+JOIN Bus_Stop BS_DEST ON RS_DEST.id_stop = BS_DEST.id_stop
+    
+-- 3. Encontra os Horários Programados para a Rota
+JOIN Schedule S ON R.id_route = S.id_route
+    
+WHERE
+    -- Filtro A: A parada de Origem deve ser a desejada
+    BS_ORIG.name = 'Nome da Parada de Origem'
+    
+    -- Filtro B: A parada de Destino deve ser a desejada
+    AND BS_DEST.name = 'Nome da Parada de Destino'
+    
+    -- Filtro C: Condição CRÍTICA - A ordem de embarque deve ser *menor* que a ordem de desembarque
+    AND RS_ORIG.stop_order < RS_DEST.stop_order
+    
+    -- Filtro D: Apenas rotas ativas e horários ativos
+    AND R.is_active = TRUE
+    AND S.is_active = TRUE
+    
+ORDER BY 
+    nome_da_rota, 
+    hora_de_partida_programada;
