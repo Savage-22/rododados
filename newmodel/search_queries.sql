@@ -186,3 +186,59 @@ WHERE
 ORDER BY 
     nome_da_rota, 
     hora_de_partida_programada;
+
+-- ================================
+-- Destinos disponíveis com menor custo pra estudantes dado posição inicial
+-- ================================
+
+WITH Viagens_Validas_E_Precos AS (
+    SELECT
+        R.id_route,
+        BS_DEST.id_stop AS id_destino,
+        BS_DEST.name AS nome_destino,
+        
+        -- Cálculo do Preço Base do Trecho
+        -- (Tarifa acumulada Destino - Tarifa acumulada Origem)
+        (RS_DEST.fare_from_origin - RS_ORIG.fare_from_origin) AS preco_base
+    FROM Bus_Stop BS_ORIG
+    -- Encontra a Parada de Origem na Tabela de Percursos (Route_Stop)
+    JOIN Route_Stop RS_ORIG ON BS_ORIG.id_stop = RS_ORIG.id_stop
+    -- Conecta à Tabela de Rotas
+    JOIN Route R ON RS_ORIG.id_route = R.id_route
+    -- Encontra todas as possíveis Paradas de Destino na Mesma Rota
+    JOIN Route_Stop RS_DEST ON R.id_route = RS_DEST.id_route
+    -- Conecta à Tabela de Paradas de Destino
+    JOIN Bus_Stop BS_DEST ON RS_DEST.id_stop = BS_DEST.id_stop
+    
+    WHERE
+        -- 1. Filtro pela posição inicial (Parâmetro)
+        BS_ORIG.name = 'Nome da Parada Inicial'
+        
+        -- 2. A parada de destino deve vir *depois* da origem no percurso
+        AND RS_DEST.stop_order > RS_ORIG.stop_order
+        
+        -- 3. Garante que o trecho tenha um custo positivo (não é a mesma parada)
+        AND (RS_DEST.fare_from_origin - RS_ORIG.fare_from_origin) > 0
+        
+        -- 4. Garante que a rota tenha pelo menos um horário ativo
+        AND EXISTS (
+            SELECT 1 
+            FROM Schedule S 
+            WHERE S.id_route = R.id_route AND S.is_active = TRUE
+        )
+)
+
+SELECT
+    VT.id_destino,
+    VT.nome_destino,
+    
+    -- Menor Preço Base encontrado para o destino (tarifa cheia)
+    MIN(VT.preco_base) AS menor_preco_base,
+    
+    -- Menor Preço ESTIMADO para Estudante
+    -- (Assumindo que o desconto é de 50%, modifique '0.50' conforme a regra de negócio)
+    ROUND(MIN(VT.preco_base) * 0.50, 2) AS menor_preco_estudante_estimado
+    
+FROM Viagens_Validas_E_Precos VT
+GROUP BY VT.id_destino, VT.nome_destino
+ORDER BY menor_preco_estudante_estimado ASC;
