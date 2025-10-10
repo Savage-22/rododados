@@ -32,3 +32,24 @@ JOIN bus_stop bs ON rs.id_stop = bs.id_stop
 JOIN company cp ON r.id_company = cp.id_company 
 GROUP BY r.id_route, cp.name, r.route_code, r.name
 ORDER BY total_cost DESC;
+
+-- ================================
+-- Passageiros que mais gastaram e se são estudantes ✅
+-- ================================
+
+SELECT
+	p.cpf,
+	CONCAT(p.first_name,' ', p.last_name) AS passenger_name,
+	ps.loyalty_points AS  total_points,
+	CASE
+		WHEN ps.is_student THEN 'Student'
+		ELSE 'Regular'
+	END AS passenger_type,
+	COUNT(t.id_ticket) AS total_purchases,
+	SUM(t.price) AS total_spend
+FROM person p
+JOIN passenger ps ON p.id_person = ps.id_person
+JOIN ticket t ON ps.id_person = t.id_passenger
+LEFT JOIN student s ON ps.id_person = s.id_person
+GROUP BY p.cpf, p.first_name, p.last_name, ps.loyalty_points, ps.is_student
+ORDER BY total_purchases DESC;
