@@ -53,3 +53,53 @@ JOIN ticket t ON ps.id_person = t.id_passenger
 LEFT JOIN student s ON ps.id_person = s.id_person
 GROUP BY p.cpf, p.first_name, p.last_name, ps.loyalty_points, ps.is_student
 ORDER BY total_purchases DESC;
+
+-- ================================
+-- Quanto cada rota gerou de receita, filtrado por semana, mês e ano para dada empresa
+-- ================================
+
+SELECT
+    -- Agrupamento temporal:
+    EXTRACT(YEAR FROM T.created_at) AS ano,
+    EXTRACT(MONTH FROM T.created_at) AS mes,
+    EXTRACT(WEEK FROM T.created_at) AS semana_no_ano,
+    
+    -- Identificação da Empresa e Rota:
+    C.name AS nome_empresa,
+    R.route_code,
+    R.name AS nome_rota,
+    
+    -- Cálculo da Receita:
+    SUM(T.price) AS receita_total
+FROM Ticket T
+JOIN Trip TR ON T.id_trip = TR.id_trip
+JOIN Schedule S ON TR.id_schedule = S.id_schedule
+JOIN Route R ON S.id_route = R.id_route
+JOIN Company C ON R.id_company = C.id_company
+-- WHERE
+--     -- 1. Filtro pela Empresa Específica (Parâmetro)
+--     C.name = 'Nome da Empresa Desejada' -- Substitua pelo nome da empresa
+--     -- OU
+--     -- R.id_company = 1 -- Substitua pelo ID da empresa
+    
+--     -- 2. Filtro pelo Status do Ticket (Opcional, mas recomendado para receita real)
+--     AND T.status = 'paid' -- Ou 'used' ou outras regras de negócio
+    
+--     -- 3. Filtro pelo Período de Tempo (Exemplo: Apenas 2025)
+--     AND EXTRACT(YEAR FROM T.created_at) = 2025
+    
+--     -- Você pode adicionar mais filtros por mês, semana ou data específica aqui.
+--     -- AND EXTRACT(MONTH FROM T.created_at) = 10
+GROUP BY 
+    ano, 
+    mes, 
+    semana_no_ano, 
+    C.name, 
+    R.route_code, 
+    R.name
+ORDER BY 
+    ano DESC, 
+    mes DESC, 
+    semana_no_ano DESC, 
+    nome_empresa, 
+    route_code;
