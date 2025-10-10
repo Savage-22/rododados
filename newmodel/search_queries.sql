@@ -103,3 +103,37 @@ ORDER BY
     semana_no_ano DESC, 
     nome_empresa, 
     route_code;
+
+-- ================================
+-- Quantos tickets cada funcionário vendeu no dia
+-- ================================
+
+SELECT
+    -- Data de Agrupamento:
+    DATE(T.created_at) AS data_da_venda,
+    
+    -- Identificação do Vendedor:
+    P.id_person AS id_vendedor,
+    P.first_name || ' ' || P.last_name AS nome_completo_vendedor,
+    E.employee_code,
+    
+    -- Contagem de Vendas:
+    COUNT(T.id_ticket) AS total_tickets_vendidos
+FROM Ticket T
+JOIN Seller S ON T.id_seller = S.id_person
+JOIN Employee E ON S.id_person = E.id_person
+JOIN Person P ON E.id_person = P.id_person
+WHERE
+    -- 1. Filtro OBRIGATÓRIO pela Data da Venda (Parâmetro)
+    DATE(T.created_at) = '2025-10-10' -- SUBSTITUA pela data desejada (AAAA-MM-DD)
+    
+    -- 2. Filtro de Status do Ticket (Opcional, para contar apenas vendas concretizadas)
+    -- AND T.status IN ('paid', 'used')
+    
+GROUP BY 
+    data_da_venda, 
+    P.id_person, 
+    P.first_name, 
+    P.last_name, 
+    E.employee_code
+ORDER BY total_tickets_vendidos DESC;
