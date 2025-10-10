@@ -242,3 +242,25 @@ SELECT
 FROM Viagens_Validas_E_Precos VT
 GROUP BY VT.id_destino, VT.nome_destino
 ORDER BY menor_preco_estudante_estimado ASC;
+
+
+
+
+-- ================================
+-- motoristas com o maior tempo de trabalho num intervalo de 30 dias
+-- ================================
+
+WITH recent_schedules AS (
+    SELECT * FROM Schedule
+    WHERE departure_time >= NOW() - interval '30 day'
+)
+SELECT
+    e.first_name || ' ' || e.last_name AS driver_name,
+    e.cpf,
+    SUM(s.travel_time) AS total_travel_time
+FROM Employee e
+JOIN ScheduleEmployee se ON e.cpf = se.employee_cpf
+JOIN recent_schedules s ON se.schedule_id = s.id
+WHERE e.role = 'Motorista'
+GROUP BY e.cpf, driver_name
+ORDER BY total_travel_time DESC;
