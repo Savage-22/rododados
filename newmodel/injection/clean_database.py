@@ -8,71 +8,56 @@ import psycopg2
 
 DB_CONFIG = {
     'host': 'localhost',
-    'database': '',
-    'user': '',
-    'password': '',
+    'database': 'rododados',
+    'user': 'pr_transporte',
+    'password': 'transporte',
     'port': 5432
 }
 
 def clean_database():
-    """Limpia todos los datos de las tablas"""
-    print("🗑️  Limpiando base de datos...")
+    """Elimina todas las tablas de la base de datos"""
+    print("🗑️  Eliminando todas las tablas...")
     
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         cursor = conn.cursor()
         
-        # Eliminar datos usando DELETE CASCADE
+        # Eliminar tablas usando DROP CASCADE (elimina las tablas completamente)
         tables_order = [
-            'Ticket',
-            'Trip', 
-            'Seat',
-            'Driver',
-            'Seller',
-            'Employee',
-            'Student',
-            'Passenger',
-            'Person',
-            'Schedule',
-            'Route_Stop',
-            'Route',
-            'Vehicle',
-            'Bus_Stop',
-            'Company'
+            'ticket',
+            'trip', 
+            'seat',
+            'driver',
+            'seller',
+            'employee',
+            'student',
+            'passenger',
+            'person',
+            'schedule',
+            'route_stop',
+            'route',
+            'vehicle',
+            'bus_stop',
+            'company'
         ]
         
         for table in tables_order:
-            cursor.execute(f"DELETE FROM {table};")
-            # Reiniciar secuencia de IDs
-            cursor.execute(f"""
-                SELECT setval(pg_get_serial_sequence('{table.lower()}', 
-                    CASE 
-                        WHEN '{table}' = 'Company' THEN 'id_company'
-                        WHEN '{table}' = 'Bus_Stop' THEN 'id_stop'
-                        WHEN '{table}' = 'Route' THEN 'id_route'
-                        WHEN '{table}' = 'Schedule' THEN 'id_schedule'
-                        WHEN '{table}' = 'Vehicle' THEN 'id_vehicle'
-                        WHEN '{table}' = 'Seat' THEN 'id_seat'
-                        WHEN '{table}' = 'Person' THEN 'id_person'
-                        WHEN '{table}' = 'Trip' THEN 'id_trip'
-                        WHEN '{table}' = 'Ticket' THEN 'id_ticket'
-                        ELSE NULL
-                    END), 1, false)
-                WHERE '{table}' IN ('Company', 'Bus_Stop', 'Route', 'Schedule', 
-                                    'Vehicle', 'Seat', 'Person', 'Trip', 'Ticket');
-            """)
-            print(f"  ✓ {table} limpiada")
+            cursor.execute(f"DROP TABLE IF EXISTS {table} CASCADE;")
+            print(f"  ✓ {table} eliminada")
         
         conn.commit()
         cursor.close()
         conn.close()
         
-        print("\n✅ Base de datos limpiada exitosamente!")
-        print("   Ahora puedes ejecutar: python3 datas_injection.py")
+        print("\n✅ Todas las tablas eliminadas exitosamente!")
+        print("   Ahora debes:")
+        print("   1. Ejecutar el script new_model.sql para recrear las tablas")
+        print("   2. Ejecutar: python3 datas_injection.py")
         
     except Exception as e:
-        print(f"\n❌ Error al limpiar base de datos: {e}")
-        conn.rollback()
+        print(f"\n❌ Error al eliminar tablas: {e}")
+        if 'conn' in locals():
+            conn.rollback()
 
 if __name__ == "__main__":
     clean_database()

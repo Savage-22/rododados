@@ -15,9 +15,9 @@ import re
 # Configuração da conexão com PostgreSQL
 DB_CONFIG = {
     'host': 'localhost',
-    'database': '',  # Altere para o nome da sua database
-    'user': '',        # Altere para seu usuário
-    'password': '',    # Altere para sua senha
+    'database': 'rododados',  # Altere para o nome da sua database
+    'user': 'pr_transporte',        # Altere para seu usuário
+    'password': 'transporte',    # Altere para sua senha
     'port': 5432
 }
 
@@ -90,7 +90,7 @@ def insert_companies(conn, num=5):
         phone = fake.phone_number()
         
         cursor.execute("""
-            INSERT INTO Company (name, cnpj, email, phone, is_active)
+            INSERT INTO company (name, cnpj, email, phone, is_active)
             VALUES (%s, %s, %s, %s, %s)
             RETURNING id_company
         """, (name, cnpj, email, phone, True))
@@ -122,7 +122,7 @@ def insert_bus_stops(conn, num=30):
         number = str(random.randint(1, 9999))
         
         cursor.execute("""
-            INSERT INTO Bus_Stop (name, street, number, city, is_active)
+            INSERT INTO bus_stop (name, street, number, city, is_active)
             VALUES (%s, %s, %s, %s, %s)
             RETURNING id_stop
         """, (name, street, number, city, True))
@@ -152,7 +152,7 @@ def insert_routes(conn, company_ids, num=10):
         route_type = random.choice(route_types)
         
         cursor.execute("""
-            INSERT INTO Route (id_company, route_code, name, description, 
+            INSERT INTO route (id_company, route_code, name, description, 
                              total_distance, route_type, is_active)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id_route
@@ -188,7 +188,7 @@ def insert_route_stops(conn, routes, stops):
                 accumulated_fare += round(random.uniform(1.50, 5.00), 2)
             
             cursor.execute("""
-                INSERT INTO Route_Stop (id_route, id_stop, stop_order, 
+                INSERT INTO route_stop (id_route, id_stop, stop_order, 
                                        distance_from_origin, estimated_min, fare_from_origin)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT DO NOTHING
@@ -222,7 +222,7 @@ def insert_schedules(conn, routes, num_per_route=3):
                 days = [1, 2, 3, 4, 5]
             
             cursor.execute("""
-                INSERT INTO Schedule (id_route, id_company, departure_time, 
+                INSERT INTO schedule (id_route, id_company, departure_time, 
                                      arrival_time, days_of_week, is_active)
                 VALUES (%s, %s, %s, %s, %s::jsonb, %s)
                 RETURNING id_schedule
@@ -276,7 +276,7 @@ def insert_vehicles(conn, company_ids, num=15):
             has_assigned_seating = True
         
         cursor.execute("""
-            INSERT INTO Vehicle (id_company, license_plate, brand, model, year, 
+            INSERT INTO vehicle (id_company, license_plate, brand, model, year, 
                                 capacity, vehicle_type, has_assigned_seating, status)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_vehicle
@@ -309,7 +309,7 @@ def insert_seats(conn, vehicles):
                 floor = 1 if seat_num <= capacity // 2 else 2 if capacity > 45 else 1
                 
                 cursor.execute("""
-                    INSERT INTO Seat (id_vehicle, seat_number, floor, is_active)
+                    INSERT INTO seat (id_vehicle, seat_number, floor, is_active)
                     VALUES (%s, %s, %s, %s)
                 """, (vehicle['id'], str(seat_num), floor, True))
     
@@ -334,7 +334,7 @@ def insert_people(conn, num_passengers=50, num_employees=20):
         birthday = fake.date_of_birth(minimum_age=18, maximum_age=80)
         
         cursor.execute("""
-            INSERT INTO Person (first_name, last_name, cpf, email, phone, 
+            INSERT INTO person (first_name, last_name, cpf, email, phone, 
                                birthday, person_type)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id_person
@@ -347,7 +347,7 @@ def insert_people(conn, num_passengers=50, num_employees=20):
         loyalty_points = random.randint(0, 1000)
         
         cursor.execute("""
-            INSERT INTO Passenger (id_person, loyalty_points, is_student)
+            INSERT INTO passenger (id_person, loyalty_points, is_student)
             VALUES (%s, %s, %s)
         """, (person_id, loyalty_points, is_student))
         
@@ -363,7 +363,7 @@ def insert_people(conn, num_passengers=50, num_employees=20):
         birthday = fake.date_of_birth(minimum_age=21, maximum_age=65)
         
         cursor.execute("""
-            INSERT INTO Person (first_name, last_name, cpf, email, phone, 
+            INSERT INTO person (first_name, last_name, cpf, email, phone, 
                                birthday, person_type)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id_person
@@ -391,7 +391,7 @@ def insert_students(conn, passengers):
             status = random.choice(['active', 'active', 'active', 'inactive'])  # 75% ativos
             
             cursor.execute("""
-                INSERT INTO Student (id_person, id_u, university_name, status)
+                INSERT INTO student (id_person, id_u, university_name, status)
                 VALUES (%s, %s, %s, %s)
             """, (passenger['id'], id_u, university, status))
     
@@ -416,7 +416,7 @@ def insert_employees_details(conn, employee_ids, company_ids):
         emp_type = random.choice(employee_types)
         
         cursor.execute("""
-            INSERT INTO Employee (id_person, employee_code, id_company, 
+            INSERT INTO employee (id_person, employee_code, id_company, 
                                  hire_date, salary, employee_type, is_active)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
         """, (emp_id, employee_code, company_id, hire_date, salary, emp_type, True))
@@ -443,7 +443,7 @@ def insert_drivers(conn, driver_ids):
         expiry_date = date.today() + timedelta(days=random.randint(365, 1825))
         
         cursor.execute("""
-            INSERT INTO Driver (id_person, license_number, license_category, 
+            INSERT INTO driver (id_person, license_number, license_category, 
                                license_expiry_date)
             VALUES (%s, %s, %s, %s)
         """, (driver_id, license_number, license_category, expiry_date))
@@ -461,7 +461,7 @@ def insert_sellers(conn, seller_ids):
         terminal_id = random.randint(1, 10)
         
         cursor.execute("""
-            INSERT INTO Seller (id_person, terminal_id)
+            INSERT INTO seller (id_person, terminal_id)
             VALUES (%s, %s)
         """, (seller_id, terminal_id))
     
@@ -495,7 +495,7 @@ def insert_trips(conn, schedules, vehicles, drivers, num_days=30):
                 continue
             
             # Combina data com horário
-            cursor.execute("SELECT departure_time, arrival_time FROM Schedule WHERE id_schedule = %s", 
+            cursor.execute("SELECT departure_time, arrival_time FROM schedule WHERE id_schedule = %s", 
                           (schedule['id'],))
             times = cursor.fetchone()
             
@@ -527,7 +527,7 @@ def insert_trips(conn, schedules, vehicles, drivers, num_days=30):
                 available = random.randint(vehicle['capacity'] // 2, vehicle['capacity'])
             
             cursor.execute("""
-                INSERT INTO Trip (id_schedule, id_vehicle, id_driver, trip_date,
+                INSERT INTO trip (id_schedule, id_vehicle, id_driver, trip_date,
                                  departure_datetime, arrival_datetime, status, available_capacity)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id_trip
@@ -542,7 +542,8 @@ def insert_trips(conn, schedules, vehicles, drivers, num_days=30):
                 'capacity': vehicle['capacity'],
                 'available': available,
                 'status': status,
-                'has_assigned_seating': vehicle['has_assigned_seating']
+                'has_assigned_seating': vehicle['has_assigned_seating'],
+                'date': trip_date  # Añadir fecha para calcular purchase_datetime
             })
     
     conn.commit()
@@ -558,7 +559,7 @@ def insert_tickets(conn, trips, passengers, sellers):
     # Buscar paradas por rota
     cursor.execute("""
         SELECT rs.id_route, rs.id_stop, rs.stop_order, rs.fare_from_origin
-        FROM Route_Stop rs
+        FROM route_stop rs
         ORDER BY rs.id_route, rs.stop_order
     """)
     route_stops_data = cursor.fetchall()
@@ -576,7 +577,7 @@ def insert_tickets(conn, trips, passengers, sellers):
         })
     
     # Buscar assentos por veículo
-    cursor.execute("SELECT id_seat, id_vehicle FROM Seat WHERE is_active = true")
+    cursor.execute("SELECT id_seat, id_vehicle FROM seat WHERE is_active = true")
     seats_data = cursor.fetchall()
     vehicle_seats = {}
     for seat_id, vehicle_id in seats_data:
@@ -593,10 +594,13 @@ def insert_tickets(conn, trips, passengers, sellers):
         # Número de tickets vendidos
         tickets_sold = trip['capacity'] - trip['available']
         
-        # Buscar rota do schedule
-        cursor.execute("SELECT id_route FROM Schedule WHERE id_schedule = %s", 
+        # Buscar rota e empresa do schedule
+        cursor.execute("SELECT id_route, id_company FROM schedule WHERE id_schedule = %s", 
                       (trip['schedule_id'],))
-        route_id = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        if not result:
+            continue
+        route_id, company_id = result
         
         if route_id not in route_stops or len(route_stops[route_id]) < 2:
             continue
@@ -633,15 +637,22 @@ def insert_tickets(conn, trips, passengers, sellers):
             payment_method = random.choice(['cash', 'card', 'pix', 'transfer'])
             status = 'used' if trip['status'] == 'completed' else 'paid'
             
+            # Data e hora de compra do ticket (entre 1-30 dias antes da viagem)
+            days_before = random.randint(1, 30)
+            purchase_date = trip['date'] - timedelta(days=days_before)
+            purchase_time = time(random.randint(8, 20), random.randint(0, 59))
+            purchase_datetime = datetime.combine(purchase_date, purchase_time)
+            
             try:
                 cursor.execute("""
-                    INSERT INTO Ticket (id_trip, id_passenger, id_seller, id_seat,
+                    INSERT INTO ticket (id_trip, id_passenger, id_seller, id_company, id_seat,
                                        id_boarding_stop, id_destination_stop, price,
-                                       discount_applied, discount_reason, payment_method, status)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (trip['id'], passenger['id'], seller, seat_id,
+                                       discount_applied, discount_reason, payment_method, 
+                                       status, purchase_datetime)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (trip['id'], passenger['id'], seller, company_id, seat_id,
                       boarding_stop, destination_stop, price,
-                      discount, discount_reason, payment_method, status))
+                      discount, discount_reason, payment_method, status, purchase_datetime))
                 ticket_count += 1
             except psycopg2.IntegrityError as e:
                 # Ignora erros de constraint (assento já vendido, etc)

@@ -9,9 +9,9 @@ import psycopg2
 # Configuração de conexão - ALTERE CONFORME NECESSÁRIO
 DB_CONFIG = {
     'host': 'localhost',
-    'database': '',
-    'user': '',
-    'password': '',
+    'database': 'rododados',
+    'user': 'pr_transporte',
+    'password': 'transporte',
     'port': 5432
 }
 

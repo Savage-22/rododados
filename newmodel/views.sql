@@ -32,11 +32,18 @@ SELECT
     tk.discount_reason,
     tk.payment_method,
     tk.status AS ticket_status,
+    tk.purchase_datetime,
+    tk.created_at,
     -- Informação do passageiro
     CONCAT(p.first_name, ' ', p.last_name) AS passenger_name,
     p.email AS passenger_email,
     p.phone AS passenger_phone,
     pas.is_student,
+    -- Informação do vendedor
+    CASE 
+        WHEN tk.id_seller IS NOT NULL THEN CONCAT(p_seller.first_name, ' ', p_seller.last_name)
+        ELSE 'Venda Online'
+    END AS seller_name,
     -- Informação de paradas
     bs_boarding.name AS boarding_stop_name,
     bs_boarding.city AS boarding_city,
@@ -53,19 +60,21 @@ SELECT
     r.route_type,
     -- Informação da companhia
     c.name AS company_name,
+    c.cnpj AS company_cnpj,
     -- Informação do veículo
     v.license_plate,
     v.vehicle_type
 FROM Ticket tk
 JOIN Passenger pas ON tk.id_passenger = pas.id_person
 JOIN Person p ON pas.id_person = p.id_person
+JOIN Company c ON tk.id_company = c.id_company
 JOIN Bus_Stop bs_boarding ON tk.id_boarding_stop = bs_boarding.id_stop
 JOIN Bus_Stop bs_destination ON tk.id_destination_stop = bs_destination.id_stop
 JOIN Trip t ON tk.id_trip = t.id_trip
 JOIN Schedule sch ON t.id_schedule = sch.id_schedule
 JOIN Route r ON sch.id_route = r.id_route
-JOIN Company c ON r.id_company = c.id_company
 JOIN Vehicle v ON t.id_vehicle = v.id_vehicle
-LEFT JOIN Seller sel ON tk.id_seller = sel.id_person;
+LEFT JOIN Seller sel ON tk.id_seller = sel.id_person
+LEFT JOIN Person p_seller ON sel.id_person = p_seller.id_person;
 
-COMMENT ON VIEW vw_ticket_details IS 'Vista completa de tickets com informação do passageiro, viagem, rota, paradas e vendedor';
+COMMENT ON VIEW vw_ticket_details IS 'Vista completa de tickets com informação do passageiro, viagem, rota, paradas, vendedor e empresa';
