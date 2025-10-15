@@ -168,11 +168,8 @@ WITH Viagens_Validas_E_Precos AS (
     -- Conecta à Tabela de Paradas de Destino
     JOIN Bus_Stop BS_DEST ON RS_DEST.id_stop = BS_DEST.id_stop
     WHERE
-        -- 1. Filtro pela posição inicial (Parâmetro)
         BS_ORIG.name = 'Nome da Parada Inicial'
-        -- 2. A parada de destino deve vir *depois* da origem no percurso
         AND RS_DEST.stop_order > RS_ORIG.stop_order
-        -- 3. Garante que o trecho tenha um custo positivo (não é a mesma parada)
         AND (RS_DEST.fare_from_origin - RS_ORIG.fare_from_origin) > 0
         AND EXISTS (
             SELECT 1 
