@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # PostgreSQL - Base de datos original
+  postgres:
+    image: postgres:16
+    container_name: rododados_postgres
+    environment:
+      POSTGRES_DB: rododados
+      POSTGRES_USER: pr_transporte
+      POSTGRES_PASSWORD: transporte
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./seed_db.sql:/docker-entrypoint-initdb.d/02-data.sql
+    networks:
+      - rododados_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pr_transporte -d rododados"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB - Base de datos NoSQL
+  mongodb:
+    image: mongo:8
+    container_name: rododados_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - rododados_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Migrator - Script de migración
+  migrator:
+    build:
+      context: ./migracion
+      dockerfile: Dockerfile
+    container_name: rododados_migrator
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    environment:
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DATABASE: rododados
+      PG_USER: pr_transporte
+      PG_PASSWORD: transporte
+      MONGO_URI: mongodb://mongodb:27017/
+      MONGO_DATABASE: rododados_mongo
+    networks:
+      - rododados_network
+    command: tail -f /dev/null  # Mantener el contenedor corriendo
+
+  # MongoDB Compass Web (opcional - interfaz web)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: rododados_mongo_express
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+      ME_CONFIG_BASICAUTH: "false"
+    networks:
+      - rododados_network
+
+volumes:
+  postgres_data:
+  mongo_data:
+
+networks:
+  rododados_network:
+    driver: bridge
