@@ -1,0 +1,362 @@
+{
+  "titulo": "Exemplo de Dados Migrados - PostgreSQL → MongoDB",
+  "descricao": "Este arquivo mostra exemplos reais de como os dados ficam estruturados no MongoDB após a migração",
+  
+  "colecoes": {
+    
+    "empresas": [
+      {
+        "_id": "ObjectId('673ab1234567890abcdef001')",
+        "cnpj": "12345678901234",
+        "nome": "Viação TransBrasil"
+      },
+      {
+        "_id": "ObjectId('673ab1234567890abcdef002')",
+        "cnpj": "98765432109876",
+        "nome": "Expresso Nacional"
+      }
+    ],
+    
+    "paradas": [
+      {
+        "_id": "ObjectId('673ab2345678901bcdef0001')",
+        "nome": "Terminal Rodoviário Central",
+        "localizacao": "Av. Principal, 1000, Centro"
+      },
+      {
+        "_id": "ObjectId('673ab2345678901bcdef0002')",
+        "nome": "Aeroporto Internacional",
+        "localizacao": "Rod. dos Bandeirantes, Km 25"
+      },
+      {
+        "_id": "ObjectId('673ab2345678901bcdef0003')",
+        "nome": "Shopping Center Norte",
+        "localizacao": "Av. Norte, 500"
+      }
+    ],
+    
+    "rotas": [
+      {
+        "_id": "ObjectId('673ab3456789012cdef00001')",
+        "origem": "ObjectId('673ab2345678901bcdef0001')",
+        "destino": "ObjectId('673ab2345678901bcdef0002')",
+        "distancia_km": 45,
+        "empresas": [
+          "ObjectId('673ab1234567890abcdef001')",
+          "ObjectId('673ab1234567890abcdef002')"
+        ],
+        "_comentario": "Rota: Terminal Central → Aeroporto (45km), operada por 2 empresas"
+      },
+      {
+        "_id": "ObjectId('673ab3456789012cdef00002')",
+        "origem": "ObjectId('673ab2345678901bcdef0001')",
+        "destino": "ObjectId('673ab2345678901bcdef0003')",
+        "distancia_km": 22,
+        "empresas": [
+          "ObjectId('673ab1234567890abcdef001')"
+        ],
+        "_comentario": "Rota: Terminal Central → Shopping Norte (22km), operada por 1 empresa"
+      }
+    ],
+    
+    "veiculos": [
+      {
+        "_id": "ObjectId('673ab4567890123def000001')",
+        "placa": "ABC1234",
+        "marca": "Mercedes-Benz",
+        "modelo": "O500RS",
+        "assentos": [
+          { "fileira": "A", "coluna": "01" },
+          { "fileira": "A", "coluna": "02" },
+          { "fileira": "A", "coluna": "03" },
+          { "fileira": "A", "coluna": "04" },
+          { "fileira": "B", "coluna": "01" },
+          { "fileira": "B", "coluna": "02" },
+          { "fileira": "B", "coluna": "03" },
+          { "fileira": "B", "coluna": "04" },
+          { "fileira": "C", "coluna": "01" },
+          { "fileira": "C", "coluna": "02" }
+        ],
+        "_comentario": "EMBEDDING: Assentos ficam dentro do documento do veículo (10 assentos neste exemplo)"
+      },
+      {
+        "_id": "ObjectId('673ab4567890123def000002')",
+        "placa": "XYZ5678",
+        "marca": "Volvo",
+        "modelo": "B12M",
+        "assentos": [
+          { "fileira": "A", "coluna": "01" },
+          { "fileira": "A", "coluna": "02" },
+          { "fileira": "A", "coluna": "03" },
+          { "fileira": "A", "coluna": "04" }
+        ],
+        "_comentario": "Veículo menor com apenas 4 assentos"
+      }
+    ],
+    
+    "passageiros": [
+      {
+        "_id": "ObjectId('673ab5678901234ef0000001')",
+        "cpf": "12345678901",
+        "nome": "João",
+        "sobrenome": "Silva",
+        "data_nascimento": "1990-05-15T00:00:00.000Z",
+        "email": "joao.silva@email.com",
+        "telefone": "11987654321",
+        "tipo": "estudante"
+      },
+      {
+        "_id": "ObjectId('673ab5678901234ef0000002')",
+        "cpf": "98765432100",
+        "nome": "Maria",
+        "sobrenome": "Santos",
+        "data_nascimento": "1985-08-22T00:00:00.000Z",
+        "email": "maria.santos@email.com",
+        "telefone": "11912345678",
+        "tipo": "regular"
+      },
+      {
+        "_id": "ObjectId('673ab5678901234ef0000003')",
+        "cpf": "55566677788",
+        "nome": "Pedro",
+        "sobrenome": "Oliveira",
+        "data_nascimento": "2002-11-30T00:00:00.000Z",
+        "email": "pedro.oliveira@email.com",
+        "telefone": "11955556666",
+        "tipo": "estudante"
+      }
+    ],
+    
+    "funcionarios": [
+      {
+        "_id": "ObjectId('673ab6789012345f00000001')",
+        "cpf": "11122233344",
+        "nome": "Carlos",
+        "sobrenome": "Mendes",
+        "data_nascimento": "1978-03-10T00:00:00.000Z",
+        "email": "carlos.mendes@viacao.com",
+        "telefone": "11944445555",
+        "cargo": "motorista",
+        "numero_licenca": "CNH12345678"
+      },
+      {
+        "_id": "ObjectId('673ab6789012345f00000002')",
+        "cpf": "44455566677",
+        "nome": "Ana",
+        "sobrenome": "Costa",
+        "data_nascimento": "1992-07-18T00:00:00.000Z",
+        "email": "ana.costa@viacao.com",
+        "telefone": "11933334444",
+        "cargo": "cobrador",
+        "numero_licenca": null
+      }
+    ],
+    
+    "horarios": [
+      {
+        "_id": "ObjectId('673ab7890123456000000001')",
+        "hora_saida": "2025-11-13T08:00:00.000Z",
+        "hora_chegada": "2025-11-13T09:30:00.000Z",
+        "tempo_viagem": "1:30:00",
+        "rota": "ObjectId('673ab3456789012cdef00001')",
+        "funcionarios": [
+          "ObjectId('673ab6789012345f00000001')",
+          "ObjectId('673ab6789012345f00000002')"
+        ],
+        "assentos": [
+          {
+            "fileira": "A",
+            "coluna": "01",
+            "disponivel": false,
+            "tickets": [
+              {
+                "preco": 45.50,
+                "passageiro": "ObjectId('673ab5678901234ef0000001')"
+              }
+            ],
+            "_comentario": "Assento A01 VENDIDO para João (estudante) - R$ 45,50"
+          },
+          {
+            "fileira": "A",
+            "coluna": "02",
+            "disponivel": false,
+            "tickets": [
+              {
+                "preco": 91.00,
+                "passageiro": "ObjectId('673ab5678901234ef0000002')"
+              }
+            ],
+            "_comentario": "Assento A02 VENDIDO para Maria (regular) - R$ 91,00"
+          },
+          {
+            "fileira": "A",
+            "coluna": "03",
+            "disponivel": true,
+            "tickets": [],
+            "_comentario": "Assento A03 DISPONÍVEL"
+          },
+          {
+            "fileira": "A",
+            "coluna": "04",
+            "disponivel": true,
+            "tickets": [],
+            "_comentario": "Assento A04 DISPONÍVEL"
+          },
+          {
+            "fileira": "B",
+            "coluna": "01",
+            "disponivel": false,
+            "tickets": [
+              {
+                "preco": 45.50,
+                "passageiro": "ObjectId('673ab5678901234ef0000003')"
+              }
+            ],
+            "_comentario": "Assento B01 VENDIDO para Pedro (estudante) - R$ 45,50"
+          },
+          {
+            "fileira": "B",
+            "coluna": "02",
+            "disponivel": true,
+            "tickets": []
+          }
+        ],
+        "_comentario": "EMBEDDING COMPLEXO: Horário contém assentos, que contêm tickets (3 níveis de aninhamento!)"
+      },
+      {
+        "_id": "ObjectId('673ab7890123456000000002')",
+        "hora_saida": "2025-11-13T14:00:00.000Z",
+        "hora_chegada": "2025-11-13T15:30:00.000Z",
+        "tempo_viagem": "1:30:00",
+        "rota": "ObjectId('673ab3456789012cdef00001')",
+        "funcionarios": [
+          "ObjectId('673ab6789012345f00000001')"
+        ],
+        "assentos": [
+          {
+            "fileira": "A",
+            "coluna": "01",
+            "disponivel": true,
+            "tickets": []
+          },
+          {
+            "fileira": "A",
+            "coluna": "02",
+            "disponivel": true,
+            "tickets": []
+          },
+          {
+            "fileira": "A",
+            "coluna": "03",
+            "disponivel": true,
+            "tickets": []
+          }
+        ],
+        "_comentario": "Horário da tarde - todos os assentos disponíveis"
+      }
+    ]
+  },
+  
+  "exemplos_de_queries": {
+    
+    "1_buscar_empresa_por_cnpj": {
+      "query": "db.empresas.findOne({ cnpj: '12345678901234' })",
+      "resultado": {
+        "_id": "ObjectId('673ab1234567890abcdef001')",
+        "cnpj": "12345678901234",
+        "nome": "Viação TransBrasil"
+      }
+    },
+    
+    "2_buscar_veiculo_completo_com_assentos": {
+      "query": "db.veiculos.findOne({ placa: 'ABC1234' })",
+      "resultado": "Retorna o veículo COM todos os assentos embedados (veja exemplo em veiculos[0])",
+      "sql_equivalente": "SELECT v.*, s.* FROM vehicle v LEFT JOIN seat s ON v.license_plate = s.license_plate WHERE v.license_plate = 'ABC1234'"
+    },
+    
+    "3_buscar_horario_completo": {
+      "query": "db.horarios.findOne({ _id: ObjectId('673ab7890123456000000001') })",
+      "resultado": "Retorna horário COM assentos E tickets embedados (3 níveis!)",
+      "sql_equivalente": "Requer 8+ JOINs: Schedule → Route → SeatOnSchedule → Seat → Ticket → Passenger → Employee"
+    },
+    
+    "4_listar_rotas_por_origem": {
+      "query": "db.rotas.find({ origem: ObjectId('673ab2345678901bcdef0001') })",
+      "resultado": "Todas as rotas que saem do Terminal Central"
+    },
+    
+    "5_contar_tickets_vendidos_por_tipo_passageiro": {
+      "query": "db.horarios.aggregate([ { $unwind: '$assentos' }, { $unwind: '$assentos.tickets' }, { $lookup: { from: 'passageiros', localField: 'assentos.tickets.passageiro', foreignField: '_id', as: 'passageiro_info' } }, { $unwind: '$passageiro_info' }, { $group: { _id: '$passageiro_info.tipo', total: { $sum: 1 }, receita: { $sum: '$assentos.tickets.preco' } } } ])",
+      "resultado": {
+        "estudante": { "total": 2, "receita": 91.00 },
+        "regular": { "total": 1, "receita": 91.00 }
+      }
+    },
+    
+    "6_passageiros_em_horario_especifico": {
+      "query": "db.horarios.aggregate([ { $match: { _id: ObjectId('673ab7890123456000000001') } }, { $unwind: '$assentos' }, { $unwind: '$assentos.tickets' }, { $lookup: { from: 'passageiros', localField: 'assentos.tickets.passageiro', foreignField: '_id', as: 'passageiro' } }, { $project: { assento: { $concat: ['$assentos.fileira', '$assentos.coluna'] }, passageiro: { $arrayElemAt: ['$passageiro.nome', 0] }, preco: '$assentos.tickets.preco' } } ])",
+      "resultado": [
+        { "assento": "A01", "passageiro": "João", "preco": 45.50 },
+        { "assento": "A02", "passageiro": "Maria", "preco": 91.00 },
+        { "assento": "B01", "passageiro": "Pedro", "preco": 45.50 }
+      ]
+    }
+  },
+  
+  "comparacao_tamanho": {
+    "sql": {
+      "tabelas": 11,
+      "registros_exemplo": {
+        "company": 2,
+        "busstop": 3,
+        "route": 2,
+        "companyroute": 3,
+        "vehicle": 2,
+        "seat": 14,
+        "passenger": 3,
+        "employee": 2,
+        "schedule": 2,
+        "scheduleemployee": 3,
+        "seatonschedule": 12,
+        "ticket": 3
+      },
+      "total_registros": 51
+    },
+    "nosql": {
+      "colecoes": 7,
+      "documentos_exemplo": {
+        "empresas": 2,
+        "paradas": 3,
+        "rotas": 2,
+        "veiculos": 2,
+        "passageiros": 3,
+        "funcionarios": 2,
+        "horarios": 2
+      },
+      "total_documentos": 16,
+      "dados_embedados": {
+        "assentos_em_veiculos": 14,
+        "assentos_em_horarios": 12,
+        "tickets_em_assentos": 3
+      }
+    },
+    "reducao": "51 registros SQL → 16 documentos NoSQL (69% de redução)"
+  },
+  
+  "vantagens_observadas": {
+    "queries_mais_simples": "Horário completo: 1 query NoSQL vs 8+ JOINs SQL",
+    "menos_io": "Dados co-localizados reduzem operações de disco",
+    "atomicidade": "Update de horário com assentos é atômico (1 documento)",
+    "legibilidade": "Estrutura JSON é mais intuitiva que tabelas normalizadas",
+    "performance": "Índice único busca dados completos (sem JOINs)"
+  },
+  
+  "metadata": {
+    "projeto": "Rododados - Sistema de Transporte",
+    "migracao": "PostgreSQL → MongoDB",
+    "script": "migracion/migrar.py",
+    "data_exemplo": "2025-11-13",
+    "versao_mongodb": "8.0",
+    "encoding": "UTF-8"
+  }
+}
